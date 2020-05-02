@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>canvas</title>
+</head>
+<style>
+    .contain {
+        background-color: #f00;
+    }
+</style>
+<script>
+    window.onload = function() {
+        var oC1 = document.getElementById("c1")
+        var cans = oC1.getContext('2d')
+        let oColor = document.getElementById("color1")
+        let lastX, lastY, color = "black";
+        oColor.onchange = function() {
+            color = this.value;
+        }
+
+
+        oC1.onmousedown = function(e) {
+            lastX = e.offsetX;
+            lastY = e.lastY;
+
+            oC1.onmousemove = function(e) {
+                cans.beginPath()
+                cans.moveTo(lastX, lastY)
+                cans.lineTo(e.offsetX, e.offsetY)
+                lastX = e.offsetX;
+                lastY = e.offsetY;
+                cans.strokeStyle = color
+                cans.stroke()
+            }
+            oC1.onmouseup = function() {
+                oC1.onmousemove = null;
+                oC1.onmouseup = null;
+            }
+        }
+    }
+</script>
+
+<body class="contain">
+    <input type="color" id="color1" />
+    <canvas style="background-color: #fff;" id='c1' width="600" height="600">
+        您的浏览器不支持canvas
+    </canvas>
+</body>
+
+</html>

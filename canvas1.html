@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>canvas</title>
+</head>
+<style>
+    .contain {
+        background-color: #f00;
+    }
+</style>
+<script>
+    window.onload = function() {
+        var oC1 = document.getElementById("c1")
+        var cans = oC1.getContext('2d')
+        let oColor = document.getElementById("color1")
+        let lastX, lastY, color = "black";
+        // 路径版
+        cans.rect(100, 100, 100, 100) // 左上角，宽，高
+            // 直接出矩形
+        cans.strokeRect(100, 100, 300, 400)
+        cans.fillRect(200, 200, 200, 200)
+
+        //弧（圆）（圆心，半径，角度）
+        // cans.arc(cx, xy, r, startAng, endAng)
+        cans.arc(300, 300, 150, 0 * Math.PI / 180, 180 * Math.PI / 180, false)
+        cans.stroke();
+    }
+</script>
+
+<body class="contain">
+    <input type="color" id="color1" />
+    <canvas style="background-color: #fff;" id='c1' width="600" height="600">
+        您的浏览器不支持canvas
+    </canvas>
+</body>
+
+</html>

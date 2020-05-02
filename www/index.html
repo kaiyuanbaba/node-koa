@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./jquery-1.8.1.min.js"></script>
+    <script src="./bundle.js"></script>
+    <script>
+        $(function() {
+
+            /**
+             * 子类继承父类  使用extents 关键字
+             * 为父类指定静态方法，使用static 方法名字
+             * super
+             *  - 在构造函数中可以当一个函数来使用，相当于调用父类的构造函数
+             *  - 在原型方法中，可以当一个对象来使用，相当于父类的原型对象，并且会自动绑定this到子类上
+             */
+
+            const canvas = document.querySelector("#canvas")
+            const ctx = canvas.getContext("2d");
+            class Ball {
+                constructor(x, y, r) {
+                    this.x = x;
+                    this.y = y;
+                    this.r = r;
+                    this.color = `rgb(${~~Ball.rpFn([55,255])},${~~Ball.rpFn([55,255])}${~~Ball.rpFn([55,255])})`;
+                    return this;
+                }
+                render(ctx) {
+                    ctx.save();
+                    ctx.translate(this.x, this.y)
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.r, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.restore();
+                    return this;
+                }
+                static rpFn(arr) {
+                    let max = Math.max(...arr),
+                        min = Math.min(...arr);
+                    return Math.random() * (max - min) * min;
+                }
+            }
+            // const ball1 = new Ball(100, 100, 30).render(ctx)
+
+            class SuperBall extends Ball {
+                constructor(x, y, r) {
+                    super(x, y, r)
+                    this.vy = SuperBall.rpFn([2, 4])
+                    this.g = SuperBall.rpFn([0.2, 0.4]);
+                    this.a = 0;
+                    return this;
+                }
+                move(ctx) {
+                    // super()  super不能当作一个函数调用
+                    this.y += this.vy;
+                    this.vy += this.g;
+                    let current = this.vy * -0.75;
+                    if (this.y + this.r >= ctx.canvas.height) {
+                        this.y = ctx.canvas.height = this.r;
+                        if (Math.abs(current - this.a) < 0.01) return false
+                        this.a = this.vy *= -0.75;
+                    }
+                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+
+                    super.render(ctx); // super可以当作一个对象去调用，它实际上是指向父类原型的对象，并且再调用父类原型方法的时候，会自动的绑定子类的this
+
+                    return true;
+                }
+            }
+            // const ball1 = new SuperBall(100, 100, 30).render(ctx)
+            let ball, timer;
+            canvas.onclick = function(e) {
+                let x = e.offsetX,
+                    y = e.offsetY;
+                let r = ~~Ball.rpFn([25, 55]);
+                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+                ballMove();
+
+            }
+
+            function ballMove() {
+                timer = window.requestAnimationFrame(ballMove);
+                if (!ball.move(ctx)) {
+                    window.cancelAnimationFrame(timer)
+                }
+            }
+            $("#btn1").click(function() {
+                $.ajax({
+                    url: '/reg',
+                    data: {
+                        user: $("#user").val(),
+                        pass: $("#pass").val()
+                    },
+                    dataType: 'json',
+                    success(res) {
+                        if (res.code) {
+                            alert(res.msg)
+                        } else {
+                            alert(res.msg)
+                        }
+                    },
+                    error(err) {
+                        alert('注册失败')
+                    }
+                })
+            })
+            $("#btn2").click(function() {
+                $.ajax({
+                    url: '/login',
+                    data: {
+                        user: $("#user").val(),
+                        pass: $("#pass").val()
+                    },
+                    dataType: 'json',
+                    success(res) {
+                        if (res.code) {
+                            alert(res.msg)
+                        } else {
+                            alert(res.msg)
+                        }
+                    },
+                    error(err) {
+                        alert('注册失败')
+                    }
+                })
+            })
+        })
+    </script>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas> 用户名：
+    <input type="text" id="user" /> <br> 密码： <input type="password" id="pass" /><br>
+    <input type="button" value="注册" id="btn1">
+    <input type="button" value="登录" id="btn2">
+
+</body>
+
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="./static/css/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <input type="text" name="" id="" v-model="taskVal">
+        <button type="submit" @click="add()">提交</button>
+        <ul>
+            <li v-for="item in items" :key="item.id">
+                <input type="checkbox" @click.prevent=toggle(item.id) :checked='item.done' name="" id="">
+                <span>{{item.title}}</span>
+                <button @click="remove(item.id)">删除</button>
+            </li>
+        </ul>
+    </div>
+</body>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            items: [],
+            taskVal: '',
+        },
+        methods: {
+            toggle(id) {
+                fetch('/toggle', {
+                    method: 'post',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify({
+                        id
+                    })
+                }).then(res => {
+                    return res.json()
+                }).then(data => {
+                    console.log(data)
+                    if (data.code) {
+
+                    } else {
+                        let todo = this.items.find(todo => todo.id == id)
+
+                        todo.done = data.data.done;
+                    }
+                })
+            },
+            remove(id) {
+                fetch('/remove', {
+                    method: 'post',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify({
+                        id
+                    })
+                }).then(res => {
+                    return res.json()
+                }).then(data => {
+                    console.log(data)
+                    if (data.code) {
+
+                    } else {
+                        this.items = this.items.filter(todo => todo.id != id)
+                    }
+                })
+            },
+            add() {
+                fetch('/add', {
+                    method: 'post',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify({
+                        title: this.taskVal
+                    })
+                }).then(res => {
+                    return res.json()
+                }).then(data => {
+                    if (data.code) {
+
+                    } else {
+                        console.log(data.data)
+                        this.items.push(data.data)
+                    }
+                    this.taskVal = ''
+                })
+            }
+        },
+        mounted() {
+            fetch("/todos").then(res => {
+                return res.json();
+            }).then(data => {
+                if (data && !data.code)
+                    this.items = data.data
+                console.log(data)
+            })
+        }
+    })
+</script>
+
+</html>

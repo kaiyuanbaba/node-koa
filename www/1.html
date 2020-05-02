@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>socket</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <!-- <link rel='stylesheet' type='text/css' media='screen' href='main.css'> -->
+    <script src='http://localhost:8080/socket.io/socket.io.js' charset="utf-8"></script>
+    <style>
+        .mine {
+            background-color: green;
+        }
+    </style>
+    <script>
+        window.onload = function() {
+            let cur_username = ''
+            let sock = io.connect("ws://localhost:8080/")
+            let onBtn1 = document.getElementById("btn1")
+            let onBtn2 = document.getElementById("btn2")
+            let onBtnSend = document.getElementById("btn_send")
+            let user = document.getElementById("user")
+            let oTxt = document.getElementById('text1')
+            let oUl = document.getElementById("ul_con")
+            let pass = document.getElementById('pass')
+            sock.on('reg_ret', (code, msg) => {
+                if (code) {
+                    alert(msg)
+                } else {
+                    alert(msg)
+                }
+            })
+            sock.on('login_ret', (code, msg) => {
+                if (code) {
+                    alert(msg)
+                } else {
+                    alert(msg)
+                    cur_username = user.value
+                }
+            })
+            onBtn1.onclick = function() {
+                sock.emit('reg', user.value, pass.value);
+            }
+            onBtn2.onclick = function() {
+                sock.emit('login', user.value, pass.value);
+            }
+
+            //消息
+            sock.on('msg_ret', (code, msg) => {
+                if (code) {
+                    alert(msg)
+                } else {
+                    let oLi = document.createElement('li');
+                    oLi.className = 'mine';
+                    oLi.innerHTML = `<h4>${cur_username}</h4><p>${oTxt.value}</p>`;
+                    oUl.appendChild(oLi)
+                    oTxt.value = '';
+                }
+            })
+            sock.on('msg', (name, txt) => {
+                let oLi = document.createElement('li');
+                oLi.innerHTML = `<h4>${name}</h4><p>${txt}</p>`;
+                oUl.appendChild(oLi)
+                oTxt.value = '';
+            });
+            onBtnSend.onclick = function() {
+                sock.emit('msg', oTxt.value)
+            }
+        }
+    </script>
+</head>
+
+<body>
+
+    用户名：<input type="text" id="user" /> <br> 密码： <input type="password" id="pass" /><br>
+    <input type="button" value="注册" id="btn1">
+    <input type="button" value="登录" id="btn2">
+    <hr>
+    <textarea id="text1" rows="4" cols="80"></textarea>
+    <input type="button" value="发送" id=btn_send>
+    <ul id="ul_con">
+
+    </ul>
+</body>
+
+</html>
